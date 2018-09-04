@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+
+        <h1>Set a new Nceno goal</h1>
+
+        <h2 id="goalfields"></h2>
+
+        <label for="name" class="col-lg-2 control-label">Stake how much?</label>
+        <input type="number" step="any" min="0" id="stake">
+
+        <label for="name" class="col-lg-2 control-label">How many hours will you be active?</label>
+        <input type="number" step="any" min="0" id="hrHours">
+
+        <label for="name" class="col-lg-2 control-label">Start the goal in this many days:</label>
+        <input type="number" min='2018-09-01' max='2019-01-01' id="beginAt">
+
+        <label for="name" class="col-lg-2 control-label">Your fitbit UserID</label>
+        <input type="number" min="0" id="fitbitID">
+
+
+        <button id="setButton">set the goal</button>
+         <!-- <button id="signButton">Sign and submit the contract</button> -->
+       
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+ 
+<!--interacting with ethereum -->
+    <script>
+      
+      var Web3 = require('web3');
+      web3 = new Web3(new Web3.providers.HttpProvider("HTTP://127.0.0.1:8545"));
+        
+
+      web3.eth.defaultAccount = web3.eth.accounts[0];
+
+      var Goal = web3.eth.contract([
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_stake",
+        "type": "uint256"
+      },
+      {
+        "name": "_hrHours",
+        "type": "uint256"
+      },
+      {
+        "name": "_beginAt",
+        "type": "uint256"
+      },
+      {
+        "name": "_fitbitID",
+        "type": "uint256"
+      }
+    ],
+    "name": "setGoal",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getGoal",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  }
+]);
+
+        var Goal = Goal.at('0x0ebaf27437322143d69566713ccc7557d312f966');
+        console.log(Goal);
+        
+
+        Goal.getGoal(function(error, result){
+            if(!error)
+                {
+                    $("#goalfields").html('stake '+ result[0]+ ' ether to do '+ result[1]+ ' hours of activity. Starting in '+ result[2] +' days.' + '(fitbitID: '+result [3]+')');
+                    console.log(result);
+                }
+            else
+                console.error(error);
+        });
+
+        $("#setButton").click(function() {
+            Goal.setGoal($("#stake").val(), $("#hrHours").val(), $("#beginAt").val(), $("#fitbitID").val());
+        });
+
+        // $("#signButton").click(function() {
+        //    Goal.confirm();
+        //});
+    </script>
+</body>
+</html>
